@@ -3,10 +3,12 @@ const mongodb = require("mongodb");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
+const dotenv = require("dotenv");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+dotenv.config();
 
 const DBURL =
   "mongodb+srv://vijay:ReTYRSovc9HOye4r@cluster0.5nom1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -14,7 +16,11 @@ const DBURL =
 const mongoClient = mongodb.MongoClient;
 const objectId = mongodb.ObjectID;
 const DB_URL = DBURL || "mongodb://127.0.0.1:27017";
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
+
+app.get("/", (req, res) => {
+  console.log("SERVER IS RUNNINg");
+});
 
 app.post("/register", async (req, res) => {
   try {
