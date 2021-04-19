@@ -129,10 +129,7 @@ app.put("/forget-pass", async (req, res) => {
     req.body.code = hash;
     let update = await db
       .collection("user")
-      .findOneAndUpdate(
-        { mail: req.body.mail },
-        { $set: { password: req.body.pass } }
-      );
+      .findOneAndUpdate({ mail: req.body.mail }, { $set: { password: hash } });
     client.close();
     res.json({ message: "password update", update });
   } catch (error) {
