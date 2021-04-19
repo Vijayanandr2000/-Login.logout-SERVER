@@ -124,8 +124,8 @@ app.put("/forget-pass", async (req, res) => {
   try {
     let client = await mongoClient.connect(DB_URL);
     let db = client.db("login");
-    let salt = await bcryptjs.genSalt(10);
-    let hash = await bcryptjs.hash(req.body.pass, salt);
+    let salt = await bcrypt.genSalt(10);
+    let hash = await bcrypt.hash(req.body.pass, salt);
     req.body.code = hash;
     let update = await db
       .collection("user")
