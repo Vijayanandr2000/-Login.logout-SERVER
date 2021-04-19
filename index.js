@@ -2,9 +2,9 @@ const express = require("express");
 const mongodb = require("mongodb");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(express.json());
@@ -17,7 +17,7 @@ const DBURL =
 const mongoClient = mongodb.MongoClient;
 const objectId = mongodb.ObjectID;
 const DB_URL = DBURL || "mongodb://127.0.0.1:27017";
-const PORT = process.env.PORT || 8000;
+const port = process.env.PORT || 8000;
 
 app.get("/", (req, res) => {
   console.log("SERVER IS RUNNINg");
@@ -106,6 +106,7 @@ app.post("/reset", async (req, res) => {
       html:
         '<h3>Reset your password Here</h3><a href="http://localhost:3000/forget-pass">Click Here</a>',
     };
+    // console.log(mailOptions);
     transporter.sendMail(mailOptions, (err, data) => {
       if (err) {
         console.log(err);
@@ -163,6 +164,6 @@ app.get("/home", authenticate, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`App is listening on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`App is listening on port ${port}`);
 });
