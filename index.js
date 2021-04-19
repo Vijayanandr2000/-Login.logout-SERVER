@@ -137,7 +137,7 @@ app.put("/forget-pass", async (req, res) => {
     res.json({ message: "password update", update });
   } catch (error) {
     console.log(error);
-    res.json({ message: "Something went wrong" });
+    res.json({ message: error.message });
   }
 });
 
