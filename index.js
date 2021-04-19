@@ -4,6 +4,7 @@ const JWT = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(express.json());
@@ -82,6 +83,62 @@ const authenticate = (req, res, next) => {
   req.token = token;
   next();
 };
+
+app.post("/reset", async (req, res) => {
+  try {
+    let client = await mongoClient.connect(DB_URL);
+    let db = client.db("login");
+    let user = await db.collection("user").findOne({ mail: req.body.mail });
+    // console.log(user)
+    if (!user) alert("User not found");
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+      },
+    });
+    let mailOptions = {
+      from: process.env.EMAIL,
+      to: user.mail,
+      subject: "Reset Password",
+      text: "click here to reset password",
+      html:
+        '<h3>Reset your password Here</h3><a href="http://localhost:3000/forget-pass">Click Here</a>',
+    };
+    transporter.sendMail(mailOptions, (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Email Sent");
+      }
+    });
+    res.json({ message: "sent" });
+    // client.close();
+  } catch (error) {
+    res.status(500).json({ message: err.message });
+  }
+});
+app.put("/forget-pass", async (req, res) => {
+  try {
+    let client = await mongoClient.connect(DB_URL);
+    let db = client.db("login");
+    let salt = await bcryptjs.genSalt(10);
+    let hash = await bcryptjs.hash(req.body.pass, salt);
+    req.body.code = hash;
+    let update = await db
+      .collection("user")
+      .findOneAndUpdate(
+        { mail: req.body.mail },
+        { $set: { password: req.body.pass } }
+      );
+    client.close();
+    res.json({ message: "password update", update });
+  } catch (error) {
+    console.log(error);
+    res.json({ message: "Something went wrong" });
+  }
+});
 
 app.get("/home", authenticate, async (req, res) => {
   try {
